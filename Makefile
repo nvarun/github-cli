@@ -93,3 +93,8 @@ uninstall:
 	rm -f ${DESTDIR}${datadir}/bash-completion/completions/gh
 	rm -f ${DESTDIR}${datadir}/fish/vendor_completions.d/gh.fish
 	rm -f ${DESTDIR}${datadir}/zsh/site-functions/_gh
+
+.PHONY: reinstall
+reinstall: bin/gh
+	install -d ${DESTDIR}${bindir}
+	install -m755 bin/gh ${DESTDIR}${bindir}/
