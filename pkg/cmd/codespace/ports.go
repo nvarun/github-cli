@@ -107,15 +107,7 @@ func (a *App) ListPorts(ctx context.Context, selector *CodespaceSelector, export
 	}
 
 	cs := a.io.ColorScheme()
-	tp := tableprinter.New(a.io)
-
-	if a.io.IsStdoutTTY() {
-		tp.AddField("LABEL")
-		tp.AddField("PORT")
-		tp.AddField("VISIBILITY")
-		tp.AddField("BROWSE URL")
-		tp.EndRow()
-	}
+	tp := tableprinter.New(a.io, tableprinter.WithHeader("LABEL", "PORT", "VISIBILITY", "BROWSE URL"))
 
 	for _, port := range portInfos {
 		// Convert the ACE to a friendly visibility string (private, org, public)
@@ -345,7 +337,11 @@ func (a *App) ForwardPorts(ctx context.Context, selector *CodespaceSelector, por
 			if err != nil {
 				return fmt.Errorf("failed to create port forwarder: %w", err)
 			}
-			return fwd.ForwardAndConnectToPort(ctx, uint16(pair.remote), listen, false, false)
+
+			opts := portforwarder.ForwardPortOpts{
+				Port: pair.remote,
+			}
+			return fwd.ForwardPortToListener(ctx, opts, listen)
 		})
 	}
 	return group.Wait() // first error
